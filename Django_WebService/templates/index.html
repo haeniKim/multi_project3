@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>튼튼한 종이비행기</title>
+    <link rel="icon" href="{% static 'images/paperplane.jpg' %}">
+
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;700&family=Poppins:wght@300;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap&JS(순서대로) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  </head>
+
+  <body>
+    <header>
+      <div class="container d-flex align-items-center py-3">
+          <a href="/" class="logo me-2">
+              <img src="https://raw.githubusercontent.com/Kihoon-Kwon/TIL/32310f27f238e965307a5b0f4ace40efaa874dc3/images/header-logo.svg" alt="과자">
+          </a>
+          <ul class="nav flex-grow-2">
+              <li class="nav-item">
+                <a href="/service" class="nav-link text-light">과자 찾기 서비스란</a>
+              </li>
+              <li class="nav-item">
+                <a href="/snack" class="nav-link text-light">과자 정보</a>
+              </li>
+              <li class="nav-item">
+                <a href="/future" class="nav-link text-light">Future Update</a>
+              </li>
+              <li class="nav-item">
+                <a href="/AboutUs" class="nav-link text-light">만든 사람들</a>
+              </li>
+          </ul>
+      </div>
+    </header>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input
+        class="custom-file-upload"
+        type="file"
+        accept="image"
+        name="image"
+        id="file"
+      />
+      <button class="compress_image mb-2" type="submit" id="submitBtn">
+        업로드
+      </button>
+
+      <!-- <div class="buttons">
+        <button onclick="startWebcam()">캠 열기</button>
+        <button onclick="stopWebcam()">캠 닫기</button>
+      </div>
+      <video id="webcam-id" autoplay="true"></video> -->
+
+      <div class="status">
+        <p id="message">{{ message }}</p>
+      </div>
+    </form>
+
+    <div class="wrapper">
+      <img
+        src="{% if image_url %}{{ image_url }}{% else %}{% static 'images/default.png' %}{% endif %}"
+        alt="Compressed Image"
+        width="400px"
+      />
+
+      <div class="info_container">
+        <ul>
+          <li>파일명: <span class="name">{{ image.name }}</span></li>
+          <li>상품 예측 결과: <span class="type">{{ prediction }}</span></li>
+          <li>상품명 듣기 👇👇</li>
+          <audio controls>
+            <source src="{% static 'snack_name.mp3' %}" type="audio/mp3">
+          </audio>
+          <li>상품 정보 👇👇</li>
+          <audio controls>
+            <source src="{% static 'snack_info.mp3' %}" type="audio/mp3">
+          </audio>
+        </ul>
+      </div>
+    </div>
+
+    <div class="header">
+      <h4><span>과자 이미지 </span>예측하기</h4>      
+    </div>
+    <div class="footer">
+      © <a href='https://kr.123rf.com/profile_captainvector'>captainvector</a>, <a href='https://www.123rf.com/free-images/'>123RF Free Images</a>
+    </div>
+    
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+      const videoEl = document.getElementById("webcam-id");
+      const startWebcam = () =>{
+        if(navigator.mediaDevices.getUserMedia){
+          navigator.mediaDevices //카메라 권한 정보 호출
+          .getUserMedia({video:true})
+          .then(stream =>{
+            videoEl.srcObject = stream;
+          })
+          .catch((err)=>{
+            console.log("카메라를 가져오지 못했습니다...",err);
+          });
+        }
+      };
+
+      const stopWebcam = () =>{
+        const stream = videoEl.srcObject;
+        const tracks = stream.getTracks();
+
+        for(let i=0;i<tracks.length;i++){
+          const track = tracks[i]
+          track.stop()
+        }
+        videoEl.srcObject=null;
+      };
+    </script>
+  </body>
+</html>
